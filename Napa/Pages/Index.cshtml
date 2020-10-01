@@ -1,0 +1,86 @@
+﻿@page
+@{
+    Layout = "_LayoutFrontEnd";
+    ViewData["LightHeader"] = true;
+    ViewData["Title"] = "Home page";
+}
+
+@section InitBody {
+    <a name="Home"></a>
+    <div class="background home"><div class="blur"></div></div>
+}
+<div class="sub-page home">
+    <div class="container pt-5">
+        <h1 id="Motto" class="display-2 text-light mt-sm-5">Il miglior lounge in città</h1>
+        <p class="text-light">Rilassati nel nostro lounge, con i nostri cocktails e vini pregiati.</p>
+        <a href="/Menu" class="btn btn-danger">Vai al menu</a>
+    </div>
+</div>
+<a name="AboutUs"></a>
+<div class="sub-page mt-5">
+    <div class="container">
+        <h2 class="display-4">Il nostro staff</h2>
+        <p>Il nostro magnifico staff è pronto ad accogliervi</p>
+        <div class="row">
+
+            <div class="col-6 col-md-3">
+                <figure class="figure w-100">
+                    <div class="wh-3-2 bg-image-cover rounded" style="background-image: url('/staff/Andrea-Capodiferro.png')"></div>
+                    <figcaption class="figure-caption">Andrea Capodiferro <br /> <span class="text-muted">Il proprietario</span></figcaption>
+                </figure>
+            </div>
+
+            <div class="col-6 col-md-3">
+                <figure class="figure w-100">
+                    <div class="wh-3-2 bg-image-cover rounded" style="background-image: url('/staff/Luca zangrando.png')"></div>
+                    <figcaption class="figure-caption">Luca zangrando<br /> <span class="text-muted">Il barista</span></figcaption>
+                </figure>
+            </div>
+        </div>
+    </div>
+</div>
+<a name="Menu"></a>
+<div class="sub-page mt-5">
+    <div class="container">
+        <h2 class="display-4">Menu</h2>
+        <div class="row">
+            <div class="col-6 col-md-3">
+                <figure class="figure w-100">
+                    <div class="wh-3-2 bg-image-cover rounded" style="background-image: url('/Americano.jpg')"></div>
+                    <figcaption class="figure-caption">Aperitivi</figcaption>
+                </figure>
+            </div>
+            <div class="col-6 col-md-3">
+                <figure class="figure w-100">
+                    <div class="wh-3-2 bg-image-cover rounded" style="background-image: url('/birre.jpg')"></div>
+                    <figcaption class="figure-caption">Birre</figcaption>
+                </figure>
+            </div>
+            <div class="col-6 col-md-3">
+                <figure class="figure w-100">
+                    <div class="wh-3-2 bg-image-cover rounded" style="background-image: url('/mai_tai.jpg')"></div>
+                    <figcaption class="figure-caption">Cocktails</figcaption>
+                </figure>
+                <span class="text-muted"></span>
+            </div>
+            <div class="col-6 col-md-3">
+                <figure class="figure w-100">
+                    <div class="wh-3-2 bg-image-cover rounded" style="background-image: url('/breakfast.jpeg')"></div>
+                    <figcaption class="figure-caption">Caffetteria</figcaption>
+                </figure>
+            </div>
+        </div>
+        <a href="/Menu" class="btn btn-danger mt-3">Vedi il menu per intetro</a>
+    </div>
+</div>
+<a name="Gallery"></a>
+<a name="ContactUs"></a>
+<div class="sub-page mt-5">
+    <div class="container">
+        <h2 class="display-4">Dove siamo</h2>
+        <p>Esattamente al centro di mestre nella piazza principale</p>
+    </div>
+    <iframe frameborder="0" style="border:0; width:100%; height:450px"
+            src="https://www.google.com/maps/embed/v1/place?key=AIzaSyASWz7YmtDOhLUuu3PVYSqAuVpV7Kybef4&q=place_id:ChIJ7yqYrmq0fkcRgX7pGVwDUBU&zoom=19" allowfullscreen>
+    </iframe>
+</div>

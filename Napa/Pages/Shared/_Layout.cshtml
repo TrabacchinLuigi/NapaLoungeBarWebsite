@@ -1,0 +1,34 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Napa Lounge Cafe</title>
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" />
+    <link rel="icon" href="/favicon-64.png" sizes="64x64" />
+    <link rel="icon" href="/favicon-128.png" sizes="128x128" />
+    <link rel="stylesheet" href="~/libs/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+     @RenderSection("Styles", required: false)
+</head>
+<body>
+    <header>
+        @RenderSection("InitBody", required: false)
+        <partial name="_NavbarTop" />
+        @RenderSection("EndBody", required: false)
+    </header>
+    <div id="main-container" class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+    <partial name="_Footer" />
+    
+    @RenderSection("PreScripts", required: false)
+
+    <script src="~/libs/jquery/jquery.min.js"></script>
+    <script src="~/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

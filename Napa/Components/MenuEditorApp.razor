@@ -1,0 +1,392 @@
+﻿@using Tewr.Blazor.FileReader
+@using System.IO
+@implements IDisposable
+@inject MenuDbContext _menuDbc
+@inject IServiceScopeFactory _serviceScopeFactory
+@inject IJSRuntime JSRuntime
+@inject IFileReaderService fileReaderService
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment _webHostEnv
+
+<h3>Menu editor</h3>
+
+@{
+    var categories = _menuDbc.Categories.OrderBy(x => x.Order).ToArray();
+    for (var iCategory = 0; iCategory < categories.Length; iCategory++)
+    {
+        var category = categories[iCategory];
+        category.Order = iCategory;
+        <table class="table table-bordered table-striped">
+            <tr>
+                <th rowspan="1000" width="1" style="background-image: url('@(category.ImageUrl)'); background-position: center; background-size: cover;">
+                    <div class="btn-group-vertical btn-group-sm" role="group">
+                        <button type="button" class="btn btn-primary" disabled="@(iCategory == 0)" @onclick="x => HandleOrderableUp(category, y => true)"><span class="oi oi-arrow-thick-top"></span></button>
+                        <button type="button" class="btn btn-primary" disabled="@(iCategory == categories.Length - 1)" @onclick="x => HandleOrderableDown(category, y => true)"><span class="oi oi-arrow-thick-bottom"></span></button>
+                        @if (@category.ImageUrl != null)
+                        {
+                            <button type="button" class="btn btn-primary" data-toggle="tooltip" data-placement="right" data-html="true" title="<img src='@category.ImageUrl' alt='' />" @onmousedown="() => { changingImageCategory = category; }" onclick="document.getElementById('input-file').click();" @onblur="HandleBlurs"><span class="oi oi-image"></span></button>
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn-primary" @onmousedown="() => { changingImageCategory = category; }" onclick="document.getElementById('input-file').click();" @onblur="HandleBlurs"><span class="oi oi-image"></span></button>
+                        }
+                        <button type="button" class="btn btn-danger" @onclick="x => InitializeDelete(category)"><span class="oi oi-trash"></span></button>
+                    </div>
+
+                </th>
+                <th colspan="2">
+                    <div class="input-group flex-nowrap">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <input type="checkbox" @bind="category.Show" @onblur="HandleBlurs" />
+                            </div>
+                        </div>
+                        <input type="text" @bind="category.Name" @onblur="HandleBlurs" class="form-control" placeholder="Menu category name" />
+                    </div>
+                </th>
+                @{
+                    var priceKinds = _menuDbc.CategoriesPriceKind.Where(x => x.CategoryId == category.Id).OrderBy(x => x.Order).ToArray();
+                    for (var iPriceKind = 0; iPriceKind < priceKinds.Length; iPriceKind++)
+                    {
+                        var priceKind = priceKinds[iPriceKind];
+                        priceKind.Order = iPriceKind;
+                        <th width="1">
+                            <div class="input-group input-group-sm flex-nowrap">
+                                <input type="text" @bind="priceKind.Name" @onblur="HandleBlurs" class="form-control" placeholder="Menu column name" style="min-width: 80px" />
+                                <div class="input-group-append">
+                                    @if (iPriceKind > 0)
+                                    {
+                                        <button type="button" class="btn btn-primary" @onclick="x => HandleOrderableUp(priceKind, y => y.CategoryId == category.Id)"><span class="oi oi-arrow-thick-left"></span></button>
+                                    }
+                                    @if (iPriceKind < priceKinds.Length - 1)
+                                    {
+                                        <button type="button" class="btn btn-primary" @onclick="x => HandleOrderableDown(priceKind, y => y.CategoryId == category.Id)"><span class="oi oi-arrow-thick-right"></span></button>
+                                    }
+                                    <button type="button" class="btn btn-danger" @onclick="x => InitializeDelete(priceKind)"><span class="oi oi-trash"></span></button>
+                                </div>
+                            </div>
+                        </th>
+                    }
+                }
+                <th rowspan="1000" width="1"><button type="button" class="btn btn-primary btn-sm" @onclick="async e => await HandleAddColumn(category)"><span class="oi oi-plus"></span></button></th>
+            </tr>
+            @{
+                var items = _menuDbc.Items.Where(x => x.CategoryId == category.Id).OrderBy(x => x.Order).ToArray();
+                for (var iItem = 0; iItem < items.Length; iItem++)
+                {
+                    var item = items[iItem];
+                    item.Order = iItem;
+                    <tr>
+                        <td width="1" class="align-middle">
+                            <div class="btn-group btn-group-sm" role="group">
+                                <button type="button" class="btn btn-primary" disabled="@(iItem == 0)" @onclick="x => HandleOrderableUp(item, y => y.CategoryId == category.Id)"><span class="oi oi-arrow-thick-top"></span></button>
+                                <button type="button" class="btn btn-primary" disabled="@(iItem == items.Length - 1)" @onclick="x => HandleOrderableDown(item, y => y.CategoryId == category.Id)"><span class="oi oi-arrow-thick-bottom"></span></button>
+                                <button type="button" class="btn btn-danger" @onclick="x => InitializeDelete(item)"><span class="oi oi-trash"></span></button>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="input-group input-group flex-nowrap mb-2">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <input type="checkbox" @bind="item.Show" @onblur="HandleBlurs" />
+                                    </div>
+                                </div>
+                                <input type="text" @bind="item.Name" @onblur="HandleBlurs" class="form-control" placeholder="Menu item name" style="min-width:100px;" />
+                            </div>
+                            <input type="text" @bind="item.Description" @onblur="HandleBlurs" class="form-control form-control-sm" placeholder="Menu item description" />
+                        </td>
+                        @foreach (var priceKind in priceKinds)
+                        {
+                            var price = _menuDbc.Prices.Where(x => x.MenuItemId == item.Id).Where(x => x.MenuPriceKindId == priceKind.Id).SingleOrDefault();
+                            if (price == null)
+                            {
+                                price = new MenuPrice() { MenuItemId = item.Id, MenuPriceKindId = priceKind.Id };
+                                using (var scope = _serviceScopeFactory.CreateScope())
+                                {
+                                    var tempDbc = scope.ServiceProvider.GetRequiredService<MenuDbContext>();
+                                    tempDbc.Prices.Add(price);
+                                    tempDbc.SaveChanges();
+                                }
+                                _menuDbc.Prices.Attach(price);
+                            }
+                            <td class="align-middle">
+                                <div class="input-group input-group-sm flex-nowrap">
+                                    <input type="number" @bind="price.Value" @onblur="HandleBlurs" step="0.1" class="form-control" />
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">€</span>
+                                    </div>
+                                </div>
+                            </td>
+                        }
+                    </tr>
+                }
+            }
+            <tr>
+                <td colspan="1000">
+                    <button type="button" class="btn btn-primary btn-sm" @onclick="async x => await HandleAddNewItem(category)"><span class="oi oi-plus"></span></button>
+                </td>
+            </tr>
+        </table>
+    }
+}
+<button type="button" class="btn btn-primary btn-sm" @onclick="async x => await HandleAddNewCategory()"><span class="oi oi-plus"></span> Add category</button>
+<input id="input-file" type="file" @ref="inputTypeFileElement" @onchange="ReadFile" class="d-none" accept="image/*" />
+
+@code {
+    private Boolean disposedValue;
+    private DotNetObjectReference<MenuEditorApp> _dotNetObjectReference;
+    private ElementReference inputTypeFileElement;
+    private INamed _entityToDelete = null;
+    private MenuCategory changingImageCategory = null;
+
+    private Boolean _shouldRender;
+    protected override bool ShouldRender() => _shouldRender;
+
+    private async Task AvoidingRenderAsync(Func<Task> func)
+    {
+        try
+        {
+            _shouldRender = false;
+            await func();
+        }
+        catch (Exception ex) { throw ex; /*just for inspection*/ }
+        finally
+        {
+            _shouldRender = true;
+        }
+    }
+
+    private async Task HandleAddNewCategory()
+    {
+        await AvoidingRenderAsync(async () =>
+        {
+            var cat = new MenuCategory() { Name = "Nuova categoria", Show = false, Order = _menuDbc.Categories.Local.Count() };
+            using (var scope = _serviceScopeFactory.CreateScope())
+            {
+                var tempDbc = scope.ServiceProvider.GetRequiredService<MenuDbContext>();
+                tempDbc.Categories.Add(cat);
+                await tempDbc.SaveChangesAsync();
+            }
+            _menuDbc.Categories.Attach(cat);
+        });
+    }
+
+    private async Task HandleAddColumn(MenuCategory category)
+    {
+        await AvoidingRenderAsync(async () =>
+        {
+            var col = new MenuCategoryPriceKind() { CategoryId = category.Id, Name = "Qualsiasi", Order = _menuDbc.CategoriesPriceKind.Local.Count() };
+            using (var scope = _serviceScopeFactory.CreateScope())
+            {
+                var tempDbc = scope.ServiceProvider.GetRequiredService<MenuDbContext>();
+                tempDbc.CategoriesPriceKind.Add(col);
+                await tempDbc.SaveChangesAsync();
+            }
+            _menuDbc.CategoriesPriceKind.Attach(col);
+        });
+    }
+
+    private async Task HandleAddNewItem(MenuCategory category)
+    {
+        await AvoidingRenderAsync(async () =>
+        {
+            var newItem = new MenuItem() { CategoryId = category.Id, Show = false, Name = "New Item", Order = _menuDbc.Items.Local.Count() };
+            using (var scope = _serviceScopeFactory.CreateScope())
+            {
+                var tempDbc = scope.ServiceProvider.GetRequiredService<MenuDbContext>();
+                tempDbc.Items.Add(newItem);
+                await tempDbc.SaveChangesAsync();
+            }
+            _menuDbc.Items.Attach(newItem);
+        });
+    }
+
+    private void InitializeDelete(INamed entity)
+    {
+        _entityToDelete = entity;
+        var kind = String.Empty;
+        switch (_entityToDelete)
+        {
+            case MenuCategory x:
+                kind = "Category";
+                break;
+            case MenuCategoryPriceKind x:
+                kind = "Price column";
+                break;
+            case MenuItem x:
+                kind = "Menu item";
+                break;
+        }
+        JSRuntime.InvokeVoidAsync("NapaJsInterop.ShowDeleteModal", entity.Name, kind);
+    }
+
+    [JSInvokable]
+    public async Task ConfirmDelete()
+    {
+        switch (_entityToDelete)
+        {
+            case MenuCategory x:
+                await DeleteCategory(x);
+                break;
+            case MenuCategoryPriceKind x:
+                await DeleteColumn(x);
+                break;
+            case MenuItem x:
+                await DeleteMenuItem(x);
+                break;
+            default: break;
+        }
+        StateHasChanged();
+    }
+
+    private async Task DeleteCategory(MenuCategory category)
+    {
+        await AvoidingRenderAsync(async () =>
+        {
+            var items = _menuDbc.Items.Local.Where(x => x.CategoryId == category.Id);
+            foreach (var item in items)
+            {
+                var prices = _menuDbc.Prices.Local.Where(x => x.MenuItemId == item.Id).ToArray();
+                _menuDbc.Prices.RemoveRange(prices);
+                await _menuDbc.SaveChangesAsync();
+            }
+            _menuDbc.Items.RemoveRange(items);
+            await _menuDbc.SaveChangesAsync();
+
+            var priceKinds = _menuDbc.CategoriesPriceKind.Local.Where(x => x.CategoryId == category.Id);
+            _menuDbc.CategoriesPriceKind.RemoveRange(priceKinds);
+            await _menuDbc.SaveChangesAsync();
+
+            _menuDbc.Categories.RemoveRange(category);
+            await _menuDbc.SaveChangesAsync();
+        });
+    }
+
+    private async Task DeleteColumn(MenuCategoryPriceKind priceKind)
+    {
+        await AvoidingRenderAsync(async () =>
+        {
+            var prices = _menuDbc.Prices.Local.Where(x => x.MenuPriceKindId == priceKind.Id).ToArray();
+            _menuDbc.Prices.RemoveRange(prices);
+            await _menuDbc.SaveChangesAsync();
+            _menuDbc.CategoriesPriceKind.Remove(priceKind);
+            await _menuDbc.SaveChangesAsync();
+        });
+    }
+
+    private async Task DeleteMenuItem(MenuItem item)
+    {
+        await AvoidingRenderAsync(async () =>
+        {
+            var prices = _menuDbc.Prices.Local.Where(x => x.MenuItemId == item.Id).ToArray();
+            _menuDbc.Prices.RemoveRange(prices);
+            await _menuDbc.SaveChangesAsync();
+            _menuDbc.Items.Remove(item);
+            await _menuDbc.SaveChangesAsync();
+        });
+    }
+
+    private async Task HandleOrderableUp<T>(T item, Func<T, Boolean> filterFunc) where T : class, IOrderable
+    {
+        await AvoidingRenderAsync(async () =>
+        {
+            var previous = _menuDbc.Set<T>().Local.Where(filterFunc).Where(x => x.Order == item.Order - 1).SingleOrDefault();
+            item.Order--;
+            if (previous != null) previous.Order++;
+            await _menuDbc.SaveChangesAsync();
+        });
+    }
+
+    private async Task HandleOrderableDown<T>(T item, Func<T, Boolean> filterFunc) where T : class, IOrderable
+    {
+        await AvoidingRenderAsync(async () =>
+        {
+            var next = _menuDbc.Set<T>().Local.Where(filterFunc).Where(x => x.Order == item.Order + 1).SingleOrDefault();
+            item.Order++;
+            if (next != null) next.Order--;
+            await _menuDbc.SaveChangesAsync();
+        });
+    }
+
+    private async Task HandleBlurs(EventArgs eventArgs)
+    {
+        await AvoidingRenderAsync(async () => await _menuDbc.SaveChangesAsync());
+    }
+
+    public MenuEditorApp()
+    {
+        _dotNetObjectReference = DotNetObjectReference.Create(this);
+    }
+
+    protected override async Task OnAfterRenderAsync(Boolean firstRender)
+    {
+        try
+        {
+            if (firstRender)
+            {
+                await JSRuntime.InvokeVoidAsync("NapaJsInterop.Initialize", _dotNetObjectReference);
+            }
+            await JSRuntime.InvokeVoidAsync("NapaJsInterop.OnAfterRender", firstRender);
+            await _menuDbc.SaveChangesAsync();
+        }
+        catch (Exception ex) { throw ex; }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    [JSInvokable]
+    public void HandleClosedDeleteModal()
+    {
+        _entityToDelete = null;
+    }
+
+    public async Task ReadFile()
+    {
+        await AvoidingRenderAsync(async () =>
+        {
+            if (changingImageCategory == null) return;
+            var reference = fileReaderService.CreateReference(inputTypeFileElement);
+            var remoteFile = (await reference.EnumerateFilesAsync()).FirstOrDefault();
+            if (remoteFile == null) return;
+
+            var remoteFileInfo = await remoteFile.ReadFileInfoAsync();
+            // Read into buffer and act (uses less memory)
+            await using (var remoteFileStream = await remoteFile.OpenReadAsync())
+            {
+                var dirPath = System.IO.Path.Combine(_webHostEnv.WebRootPath, "Uploads");
+                if (!System.IO.Directory.Exists(dirPath))
+                {
+                    System.IO.Directory.CreateDirectory(dirPath);
+                }
+                var filePath = System.IO.Path.Combine(dirPath, remoteFileInfo.Name);
+                using (var file = System.IO.File.Create(filePath))
+                {
+                    await remoteFileStream.CopyToAsync(file);
+                }
+
+            }
+
+            await reference.ClearValue();
+            changingImageCategory.ImageUrl = $"/Uploads/{System.Net.WebUtility.UrlEncode(remoteFileInfo.Name)}";
+            StateHasChanged();
+        });
+    }
+
+    protected virtual void Dispose(Boolean disposing)
+    {
+        if (!disposedValue)
+        {
+            if (disposing)
+            {
+                _dotNetObjectReference.Dispose();
+            }
+
+            disposedValue = true;
+        }
+    }
+
+    public void Dispose()
+    {
+        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+}

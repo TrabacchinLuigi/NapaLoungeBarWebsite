@@ -1,0 +1,60 @@
+﻿@page
+@attribute [Authorize(Roles = Napa.Roles.Administrator)]
+@{
+    ViewData["LightHeader"] = true;
+    ViewData["Title"] = "Menu editor";
+}
+@section Styles {
+    <style type="text/css">
+        .tooltip {
+            opacity: 1!important;
+        }
+        .tooltip-inner > img {
+            display: block;
+            max-height: 100%;
+            max-width: 100%;
+        }
+    </style>
+}
+@section PreScripts {
+    <script src="/libs/popper/umd/popper.min.js"></script>
+}
+@section Scripts {
+    <script src="_framework/blazor.server.js"></script>
+    <script src="/NapaJsInterop.js"></script>
+}
+
+<div class="backend-page">
+    <component type="typeof(Components.MenuEditorApp)" render-mode="Server" />
+</div>
+
+<div id="blazor-error-ui">
+    <environment include="Staging,Production">
+        An error has occurred. This application may no longer respond until reloaded.
+    </environment>
+    <environment include="Development">
+        An unhandled exception has occurred. See browser dev tools for details.
+    </environment>
+    <a href="" class="reload">Reload</a>
+    <a class="dismiss">🗙</a>
+</div>
+
+<div class="modal fade" id="delete-entity-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Are you sure ?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                You are about to delete <strong id="delete-what-kind"></strong> named <strong id="delete-what-name"></strong>, are you sure you want to do this ?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="delete-confirm"><span class="oi oi-trash"></span> Delete</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,27 @@
+﻿<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light mb-3 px-0 pt-0 pt-sm-2">
+    <div class="container-md d-flex flex-column flex-sm-row">
+        <a class="navbar-brand brand mx-0 mr-sm-3" asp-area="" asp-page="/Index">
+            <inlinesvg src="Logo.svg" />
+        </a>
+        <div class="d-inline-flex flex-grow-1 flex-column text-center">
+            <ul class="navbar-nav justify-content-end">
+                <li class="nav-item">
+                    <a class="nav-link text-light" href="/#Home">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-light" href="/#AboutUs">About us</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-light" href="/Menu">Menu</a>
+                </li>
+                @*<li class="nav-item">
+                        <a class="nav-link text-light" asp-area="" asp-page="@Pagelink" asp-fragment="Gallery">Gallery</a>
+                    </li>*@
+                <li class="nav-item">
+                    <a class="nav-link text-light" href="/#ContactUs">Contact us</a>
+                </li>
+            </ul>
+            <partial name="_LoginPartial" />
+        </div>
+    </div>
+</nav>

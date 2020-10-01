@@ -1,0 +1,102 @@
+﻿@page
+@inject MenuDbContext dbc
+@{
+        Layout = "_LayoutFrontEnd";
+        ViewData["LightHeader"] = true;
+        ViewData["Title"] = "Menu";
+}
+@section InitBody {
+    <div class="background menu">
+        <div class="blur"></div>
+    </div>
+}
+@section EndBody {
+    
+}
+<div class="sub-page" id="FullPage-Menu">
+
+    <div class="container mb-5 pb-5">
+        <div class="page-title pb-5">
+            <h1 class="display-3 text-light">Menu</h1>
+            <p class="text-light">Consulta il nostro menù e scegli cosa ti va di gustare oggi.</p>
+        </div>
+
+        @{
+            var even = false;
+
+            foreach (var category in dbc.Categories.Where(x => x.Show).OrderBy(x => x.Order).ToArray())
+            {
+                even = !even;
+                <h2 class="display-4 mt-5 @(even ? "" : "text-right")">@category.Name</h2>
+                <div class="row">
+                    @if (!even)
+                    {
+                        <div class="d-none d-sm-block col-sm-3 col-md-5 bg-image-cover" style="background:url('@category.ImageUrl');"></div>
+                    }
+                    <div class="col-12 col-sm-9 col-md-7">
+                        <table class="table table-hover small">
+                            @{
+
+                                var priceCats = dbc.CategoriesPriceKind.Where(x => x.CategoryId == category.Id).OrderBy(x => x.Order).ToArray();
+                                if (priceCats.Length > 1)
+                                {
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            @foreach (var pricecat in priceCats)
+                                            {
+                                                <th>@(pricecat.Name)</th>
+                                            }
+                                        </tr>
+                                    </thead>
+                                }
+
+                                foreach (var item in dbc.Items.Where(x => x.CategoryId == category.Id).Where(x => x.Show).OrderBy(x => x.Order).ToArray())
+                                {
+                                    <tr>
+                                        <td>@item.Name <small class="d-block text-muted">@item.Description</small></td>
+                                        @{
+                                            var prices = priceCats.Select(pc => dbc.Prices.Where(x => x.MenuItemId == item.Id).Where(x => x.MenuPriceKindId == pc.Id).Single()).ToArray();
+                                            var grouped = prices
+                                                .Select(x => (ColSpan: (Byte)1, Value: x.Value))
+                                                .Aggregate(
+                                                    new List<(Byte Colspan, Single Value)>(),
+                                                    (x, y) =>
+                                                    {
+                                                        if (!x.Any()) { x.Add(y); }
+                                                        else {
+                                                            var previousGroup = x.Last();
+                                                            x.RemoveAt(x.Count - 1);
+                                                            if (previousGroup.Value == y.Value)
+                                                            {
+                                                                previousGroup.Colspan++;
+                                                                x.Add(previousGroup);
+                                                            }
+                                                            else
+                                                            {
+                                                                x.Add(previousGroup);
+                                                                x.Add(y);
+                                                            }
+
+                                                        }
+                                                        return x;
+                                                    });
+                                        }
+                                        @foreach (var priceGroup in grouped)
+                                        {
+                                            <td colspan="@priceGroup.Colspan">@priceGroup.Value.ToString("F") €</td>
+                                        }
+                                    </tr>
+                                }
+                            }
+                        </table>
+                    </div>
+                    @if (even)
+                    {
+                        <div class="d-none d-sm-block col-sm-3 col-md-5 bg-image-cover" style="background:url('@category.ImageUrl');"></div>
+                    }
+                </div>
+            }
+        }
+    </div>
+</div>

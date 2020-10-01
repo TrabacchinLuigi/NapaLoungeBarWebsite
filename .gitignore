@@ -1,0 +1,12 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/Napa/bin
+/Napa/obj
+/Napa/wwwroot/libs
+/Napa/wwwroot/Uploads
+/Napa/appsettings.Production.json
+/Napa/appsettings.Development.json
+/.vs
+/Napa/Properties/**/*.user

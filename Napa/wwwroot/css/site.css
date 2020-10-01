@@ -1,0 +1,298 @@
+@import url('/libs/open-iconic/font/css/open-iconic-bootstrap.min.css');
+
+body {
+    overflow-x: hidden;
+}
+
+.navbar-toggler {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/*.valid.modified:not([type=checkbox]) {
+    outline: 1px solid #26b050;
+}
+
+.invalid {
+    outline: 1px solid red;
+}
+
+.validation-message {
+    color: red;
+}*/
+
+#blazor-error-ui {
+    background: lightyellow;
+    bottom: 0;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+    #blazor-error-ui .dismiss {
+        cursor: pointer;
+        position: absolute;
+        right: 0.75rem;
+        top: 0.5rem;
+    }
+
+/*@media (max-width: 767.98px) {
+    .main .top-row:not(.auth) {
+        display: none;
+    }
+
+    .main .top-row.auth {
+        justify-content: space-between;
+    }
+
+    .main .top-row a, .main .top-row .btn-link {
+        margin-left: 0;
+    }
+}
+
+@media (min-width: 768px) {
+    app {
+        flex-direction: row;
+    }
+
+    .sidebar {
+        width: 250px;
+        height: 100vh;
+        position: sticky;
+        top: 0;
+    }
+
+    .main .top-row {
+        position: sticky;
+        top: 0;
+    }
+
+    .main > div {
+        padding-left: 2rem !important;
+        padding-right: 1.5rem !important;
+    }
+
+    .navbar-toggler {
+        display: none;
+    }
+
+    .sidebar .collapse {*/
+/* Never collapse the sidebar for wide screens */
+/*display: block;
+    }
+}
+        
+.bar-manager {
+    position: relative;
+}
+
+.tavolino {
+    position: absolute;
+    background-color: saddlebrown;
+    border: 1px solid #333;
+}
+
+.hours {
+    display: flex;
+    flex-flow: row;
+    align-content: flex-start;
+    flex-wrap: wrap;
+}
+
+    .hours .slot:first-child; .hours .slot:last-child {
+        margin: 0;
+    }
+
+    .hours .slot {
+        flex-grow: 0;
+        flex-shrink: 0;
+        margin: -1px 0 0 -1px;
+        border: 1px solid #666;
+        background-color: #fec8c8;
+        width: 12px;
+        height: 18px;
+        box-sizing: content-box;
+    }
+*/
+header .container-md {
+    overflow: hidden;
+}
+
+header .brand > svg {
+    width: 75vw;
+}
+
+.sub-page.home {
+    height: 400px;
+}
+
+@media (max-width: 575px ) {
+    header .navbar {
+        background-color: #000000AA;
+    }
+
+    header .background.menu {
+        height: 500px;
+    }
+
+    #FullPage-Menu .page-title {
+        margin-bottom: 100px;
+    }
+}
+
+@media (max-width: 767px ) {
+    #Motto {
+        font-size: 10vw;
+    }
+}
+
+@media (min-width: 576px) {
+    header .brand > svg {
+        width: 200px;
+    }
+
+    .sub-page.home {
+        height: 560px;
+    }
+}
+
+@media (min-width: 768px) {
+    header .brand > svg {
+        width: 256px;
+    }
+}
+
+@media (min-width: 992px) {
+    header .brand > svg {
+        width: 256px;
+    }
+}
+
+@media (min-width: 1200px) {
+}
+
+header {
+    background-color: #333;
+    overflow-y: visible;
+}
+
+.brand > svg {
+    padding: 3.92% 8% 2.9%;
+}
+
+
+
+
+.sub-page {
+    position: relative;
+    overflow: hidden;
+}
+
+.background {
+    position: absolute;
+    overflow: hidden;
+    width: 100%;
+}
+
+    .background > .blur {
+        width: 101%;
+        height: 101%;
+        margin: -0.5%;
+        background-position: center;
+        background-size: cover;
+        filter: blur(5px) saturate(100%) brightness(80%);
+        min-height: 100px;
+    }
+
+    .background.home {
+        height: 700px;
+    }
+
+        .background.home > .blur {
+            background-image: url('../Spritz.jpg');
+        }
+
+    .background.menu {
+        height: 260px;
+    }
+
+        .background.menu > .blur {
+            height: 110%;
+            background-image: url('../cocktails.webp')
+        }
+
+footer .brand > svg {
+    width: 100%;
+}
+
+.brand > svg {
+    background-color: brown;
+    fill: white;
+}
+
+.oi > .facebook {
+    background-image: url('../Socials/flat-facebook.svg');
+}
+
+footer {
+    background-color: #222;
+}
+
+    footer a {
+        color: white;
+    }
+
+    footer ul {
+        margin: 0;
+        padding: 0;
+    }
+
+        footer ul li {
+            margin: 0;
+            padding: 0.2em 0;
+            text-decoration: none;
+            list-style: none;
+        }
+
+
+.oi.social > svg {
+    width: 1em;
+    height: 1em;
+    fill: white;
+}
+
+#FullPage-Menu table tr th:nth-child(2), #FullPage-Menu table tr th:nth-child(3),
+#FullPage-Menu table tr td:nth-child(2), #FullPage-Menu table tr td:nth-child(3) {
+    text-align: center;
+}
+
+
+.wh-4-3 {
+    width: 100%;
+    padding-top: 75%; /* 4:3 Aspect Ratio (divide 3 by 4 = 0.75) */
+    overflow: hidden;
+    position: relative;
+}
+
+.wh-3-2 {
+    width: 100%;
+    padding-top: 66.66%; /* 3:2 Aspect Ratio (divide 2 by 3 = 0.6666)  */
+    overflow: hidden;
+    position: relative;
+}
+
+.wh-16-9 {
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 Aspect Ratio */
+    overflow: hidden;
+    position: relative;
+}
+
+.bg-image-cover {
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-size: cover !important;
+}

@@ -8,126 +8,127 @@
 @inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment _webHostEnv
 
 <h3>Menu editor</h3>
-
-@{
-    var categories = _menuDbc.Categories.OrderBy(x => x.Order).ToArray();
-    for (var iCategory = 0; iCategory < categories.Length; iCategory++)
-    {
-        var category = categories[iCategory];
-        category.Order = iCategory;
-        <table class="table table-bordered table-striped">
-            <tr>
-                <th rowspan="1000" width="1" style="background-image: url('@(category.ImageUrl)'); background-position: center; background-size: cover;">
-                    <div class="btn-group-vertical btn-group-sm" role="group">
-                        <button type="button" class="btn btn-primary" disabled="@(iCategory == 0)" @onclick="x => HandleOrderableUp(category, y => true)"><span class="oi oi-arrow-thick-top"></span></button>
-                        <button type="button" class="btn btn-primary" disabled="@(iCategory == categories.Length - 1)" @onclick="x => HandleOrderableDown(category, y => true)"><span class="oi oi-arrow-thick-bottom"></span></button>
-                        @if (@category.ImageUrl != null)
-                        {
-                            <button type="button" class="btn btn-primary" data-toggle="tooltip" data-placement="right" data-html="true" title="<img src='@category.ImageUrl' alt='' />" @onmousedown="() => { changingImageCategory = category; }" onclick="document.getElementById('input-file').click();" @onblur="HandleBlurs"><span class="oi oi-image"></span></button>
-                        }
-                        else
-                        {
-                            <button type="button" class="btn btn-primary" @onmousedown="() => { changingImageCategory = category; }" onclick="document.getElementById('input-file').click();" @onblur="HandleBlurs"><span class="oi oi-image"></span></button>
-                        }
-                        <button type="button" class="btn btn-danger" @onclick="x => InitializeDelete(category)"><span class="oi oi-trash"></span></button>
-                    </div>
-
-                </th>
-                <th colspan="2">
-                    <div class="input-group flex-nowrap">
-                        <div class="input-group-prepend">
-                            <div class="input-group-text">
-                                <input type="checkbox" @bind="category.Show" @onblur="HandleBlurs" />
-                            </div>
-                        </div>
-                        <input type="text" @bind="category.Name" @onblur="HandleBlurs" class="form-control" placeholder="Menu category name" />
-                    </div>
-                </th>
-                @{
-                    var priceKinds = _menuDbc.CategoriesPriceKind.Where(x => x.CategoryId == category.Id).OrderBy(x => x.Order).ToArray();
-                    for (var iPriceKind = 0; iPriceKind < priceKinds.Length; iPriceKind++)
-                    {
-                        var priceKind = priceKinds[iPriceKind];
-                        priceKind.Order = iPriceKind;
-                        <th width="1">
-                            <div class="input-group input-group-sm flex-nowrap">
-                                <input type="text" @bind="priceKind.Name" @onblur="HandleBlurs" class="form-control" placeholder="Menu column name" style="min-width: 80px" />
-                                <div class="input-group-append">
-                                    @if (iPriceKind > 0)
-                                    {
-                                        <button type="button" class="btn btn-primary" @onclick="x => HandleOrderableUp(priceKind, y => y.CategoryId == category.Id)"><span class="oi oi-arrow-thick-left"></span></button>
-                                    }
-                                    @if (iPriceKind < priceKinds.Length - 1)
-                                    {
-                                        <button type="button" class="btn btn-primary" @onclick="x => HandleOrderableDown(priceKind, y => y.CategoryId == category.Id)"><span class="oi oi-arrow-thick-right"></span></button>
-                                    }
-                                    <button type="button" class="btn btn-danger" @onclick="x => InitializeDelete(priceKind)"><span class="oi oi-trash"></span></button>
-                                </div>
-                            </div>
-                        </th>
-                    }
-                }
-                <th rowspan="1000" width="1"><button type="button" class="btn btn-primary btn-sm" @onclick="async e => await HandleAddColumn(category)"><span class="oi oi-plus"></span></button></th>
-            </tr>
-            @{
-                var items = _menuDbc.Items.Where(x => x.CategoryId == category.Id).OrderBy(x => x.Order).ToArray();
-                for (var iItem = 0; iItem < items.Length; iItem++)
-                {
-                    var item = items[iItem];
-                    item.Order = iItem;
-                    <tr>
-                        <td width="1" class="align-middle">
-                            <div class="btn-group btn-group-sm" role="group">
-                                <button type="button" class="btn btn-primary" disabled="@(iItem == 0)" @onclick="x => HandleOrderableUp(item, y => y.CategoryId == category.Id)"><span class="oi oi-arrow-thick-top"></span></button>
-                                <button type="button" class="btn btn-primary" disabled="@(iItem == items.Length - 1)" @onclick="x => HandleOrderableDown(item, y => y.CategoryId == category.Id)"><span class="oi oi-arrow-thick-bottom"></span></button>
-                                <button type="button" class="btn btn-danger" @onclick="x => InitializeDelete(item)"><span class="oi oi-trash"></span></button>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="input-group input-group flex-nowrap mb-2">
-                                <div class="input-group-prepend">
-                                    <div class="input-group-text">
-                                        <input type="checkbox" @bind="item.Show" @onblur="HandleBlurs" />
-                                    </div>
-                                </div>
-                                <input type="text" @bind="item.Name" @onblur="HandleBlurs" class="form-control" placeholder="Menu item name" style="min-width:100px;" />
-                            </div>
-                            <input type="text" @bind="item.Description" @onblur="HandleBlurs" class="form-control form-control-sm" placeholder="Menu item description" />
-                        </td>
-                        @foreach (var priceKind in priceKinds)
-                        {
-                            var price = _menuDbc.Prices.Where(x => x.MenuItemId == item.Id).Where(x => x.MenuPriceKindId == priceKind.Id).SingleOrDefault();
-                            if (price == null)
+<div style="overflow-y: auto;">
+    @{
+        var categories = _menuDbc.Categories.OrderBy(x => x.Order).ToArray();
+        for (var iCategory = 0; iCategory < categories.Length; iCategory++)
+        {
+            var category = categories[iCategory];
+            category.Order = iCategory;
+            <table class="table table-bordered table-striped">
+                <tr>
+                    <th rowspan="1000" width="1" style="background-image: url('@(category.ImageUrl)'); background-position: center; background-size: cover;">
+                        <div class="btn-group-vertical btn-group-sm" role="group">
+                            <button type="button" class="btn btn-primary" disabled="@(iCategory == 0)" @onclick="x => HandleOrderableUp(category, y => true)"><span class="oi oi-arrow-thick-top"></span></button>
+                            <button type="button" class="btn btn-primary" disabled="@(iCategory == categories.Length - 1)" @onclick="x => HandleOrderableDown(category, y => true)"><span class="oi oi-arrow-thick-bottom"></span></button>
+                            @if (@category.ImageUrl != null)
                             {
-                                price = new MenuPrice() { MenuItemId = item.Id, MenuPriceKindId = priceKind.Id };
-                                using (var scope = _serviceScopeFactory.CreateScope())
-                                {
-                                    var tempDbc = scope.ServiceProvider.GetRequiredService<MenuDbContext>();
-                                    tempDbc.Prices.Add(price);
-                                    tempDbc.SaveChanges();
-                                }
-                                _menuDbc.Prices.Attach(price);
+                                <button type="button" class="btn btn-primary" data-toggle="tooltip" data-placement="right" data-html="true" title="<img src='@category.ImageUrl' alt='' />" @onmousedown="() => { changingImageCategory = category; }" onclick="document.getElementById('input-file').click();" @onblur="HandleBlurs"><span class="oi oi-image"></span></button>
                             }
-                            <td class="align-middle">
+                            else
+                            {
+                                <button type="button" class="btn btn-primary" @onmousedown="() => { changingImageCategory = category; }" onclick="document.getElementById('input-file').click();" @onblur="HandleBlurs"><span class="oi oi-image"></span></button>
+                            }
+                            <button type="button" class="btn btn-danger" @onclick="x => InitializeDelete(category)"><span class="oi oi-trash"></span></button>
+                        </div>
+
+                    </th>
+                    <th colspan="2">
+                        <div class="input-group flex-nowrap">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <input type="checkbox" @bind="category.Show" @onblur="HandleBlurs" />
+                                </div>
+                            </div>
+                            <input type="text" @bind="category.Name" @onblur="HandleBlurs" class="form-control" placeholder="Menu category name" />
+                        </div>
+                    </th>
+                    @{
+                        var priceKinds = _menuDbc.CategoriesPriceKind.Where(x => x.CategoryId == category.Id).OrderBy(x => x.Order).ToArray();
+                        for (var iPriceKind = 0; iPriceKind < priceKinds.Length; iPriceKind++)
+                        {
+                            var priceKind = priceKinds[iPriceKind];
+                            priceKind.Order = iPriceKind;
+                            <th width="1">
                                 <div class="input-group input-group-sm flex-nowrap">
-                                    <input type="number" @bind="price.Value" @onblur="HandleBlurs" step="0.1" class="form-control" />
+                                    <input type="text" @bind="priceKind.Name" @onblur="HandleBlurs" class="form-control" placeholder="Menu column name" style="min-width: 80px" />
                                     <div class="input-group-append">
-                                        <span class="input-group-text">€</span>
+                                        @if (iPriceKind > 0)
+                                        {
+                                            <button type="button" class="btn btn-primary" @onclick="x => HandleOrderableUp(priceKind, y => y.CategoryId == category.Id)"><span class="oi oi-arrow-thick-left"></span></button>
+                                        }
+                                        @if (iPriceKind < priceKinds.Length - 1)
+                                        {
+                                            <button type="button" class="btn btn-primary" @onclick="x => HandleOrderableDown(priceKind, y => y.CategoryId == category.Id)"><span class="oi oi-arrow-thick-right"></span></button>
+                                        }
+                                        <button type="button" class="btn btn-danger" @onclick="x => InitializeDelete(priceKind)"><span class="oi oi-trash"></span></button>
                                     </div>
+                                </div>
+                            </th>
+                        }
+                    }
+                    <th rowspan="1000" width="1"><button type="button" class="btn btn-primary btn-sm" @onclick="async e => await HandleAddColumn(category)"><span class="oi oi-plus"></span></button></th>
+                </tr>
+                @{
+                    var items = _menuDbc.Items.Where(x => x.CategoryId == category.Id).OrderBy(x => x.Order).ToArray();
+                    for (var iItem = 0; iItem < items.Length; iItem++)
+                    {
+                        var item = items[iItem];
+                        item.Order = iItem;
+                        <tr>
+                            <td width="1" class="align-middle">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <button type="button" class="btn btn-primary" disabled="@(iItem == 0)" @onclick="x => HandleOrderableUp(item, y => y.CategoryId == category.Id)"><span class="oi oi-arrow-thick-top"></span></button>
+                                    <button type="button" class="btn btn-primary" disabled="@(iItem == items.Length - 1)" @onclick="x => HandleOrderableDown(item, y => y.CategoryId == category.Id)"><span class="oi oi-arrow-thick-bottom"></span></button>
+                                    <button type="button" class="btn btn-danger" @onclick="x => InitializeDelete(item)"><span class="oi oi-trash"></span></button>
                                 </div>
                             </td>
-                        }
-                    </tr>
+                            <td>
+                                <div class="input-group input-group flex-nowrap mb-2">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text">
+                                            <input type="checkbox" @bind="item.Show" @onblur="HandleBlurs" />
+                                        </div>
+                                    </div>
+                                    <input type="text" @bind="item.Name" @onblur="HandleBlurs" class="form-control" placeholder="Menu item name" style="min-width:100px;" />
+                                </div>
+                                <input type="text" @bind="item.Description" @onblur="HandleBlurs" class="form-control form-control-sm" placeholder="Menu item description" />
+                            </td>
+                            @foreach (var priceKind in priceKinds)
+                            {
+                                var price = _menuDbc.Prices.Where(x => x.MenuItemId == item.Id).Where(x => x.MenuPriceKindId == priceKind.Id).SingleOrDefault();
+                                if (price == null)
+                                {
+                                    price = new MenuPrice() { MenuItemId = item.Id, MenuPriceKindId = priceKind.Id };
+                                    using (var scope = _serviceScopeFactory.CreateScope())
+                                    {
+                                        var tempDbc = scope.ServiceProvider.GetRequiredService<MenuDbContext>();
+                                        tempDbc.Prices.Add(price);
+                                        tempDbc.SaveChanges();
+                                    }
+                                    _menuDbc.Prices.Attach(price);
+                                }
+                                <td class="align-middle">
+                                    <div class="input-group input-group-sm flex-nowrap">
+                                        <input type="number" @bind="price.Value" @onblur="HandleBlurs" step="0.1" class="form-control" />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">€</span>
+                                        </div>
+                                    </div>
+                                </td>
+                            }
+                        </tr>
+                    }
                 }
-            }
-            <tr>
-                <td colspan="1000">
-                    <button type="button" class="btn btn-primary btn-sm" @onclick="async x => await HandleAddNewItem(category)"><span class="oi oi-plus"></span></button>
-                </td>
-            </tr>
-        </table>
+                <tr>
+                    <td colspan="1000">
+                        <button type="button" class="btn btn-primary btn-sm" @onclick="async x => await HandleAddNewItem(category)"><span class="oi oi-plus"></span></button>
+                    </td>
+                </tr>
+            </table>
+        }
     }
-}
+</div>
 <button type="button" class="btn btn-primary btn-sm" @onclick="async x => await HandleAddNewCategory()"><span class="oi oi-plus"></span> Add category</button>
 <input id="input-file" type="file" @ref="inputTypeFileElement" @onchange="ReadFile" class="d-none" accept="image/*" />
 

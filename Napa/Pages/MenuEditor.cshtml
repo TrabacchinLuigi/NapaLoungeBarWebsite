@@ -28,15 +28,18 @@
     <component type="typeof(Components.MenuEditorApp)" render-mode="Server" />
 </div>
 
-<div id="blazor-error-ui">
-    <environment include="Staging,Production">
-        An error has occurred. This application may no longer respond until reloaded.
-    </environment>
-    <environment include="Development">
-        An unhandled exception has occurred. See browser dev tools for details.
-    </environment>
-    <a href="" class="reload">Reload</a>
-    <a class="dismiss">🗙</a>
+<div id="blazor-error-ui" class="fixed-top vw-100 vh-100">
+    <div class="w-100 h-100 d-flex flex-column align-items-stretch justify-content-center p-5">
+        <div class="alert alert-warning" role="alert">
+            <environment include="Staging,Production">
+                An error has occurred. This application may no longer respond until reloaded.
+            </environment>
+            <environment include="Development">
+                An unhandled exception has occurred. See browser dev tools for details.
+            </environment>
+            <a href="" class="reload alert-link">Reload</a>
+        </div>
+    </div>
 </div>
 
 <div class="modal fade" id="delete-entity-modal" tabindex="-1" aria-hidden="true">

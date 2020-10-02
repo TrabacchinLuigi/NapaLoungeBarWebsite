@@ -1,17 +1,14 @@
 ﻿@page
 @inject MenuDbContext dbc
 @{
-        Layout = "_LayoutFrontEnd";
-        ViewData["LightHeader"] = true;
-        ViewData["Title"] = "Menu";
+    Layout = "_LayoutFrontEnd";
+    ViewData["LightHeader"] = true;
+    ViewData["Title"] = "Menu";
 }
 @section InitBody {
     <div class="background menu">
         <div class="blur"></div>
     </div>
-}
-@section EndBody {
-    
 }
 <div class="sub-page" id="FullPage-Menu">
 
@@ -64,7 +61,8 @@
                                                     (x, y) =>
                                                     {
                                                         if (!x.Any()) { x.Add(y); }
-                                                        else {
+                                                        else
+                                                        {
                                                             var previousGroup = x.Last();
                                                             x.RemoveAt(x.Count - 1);
                                                             if (previousGroup.Value == y.Value)
@@ -84,7 +82,14 @@
                                         }
                                         @foreach (var priceGroup in grouped)
                                         {
-                                            <td colspan="@priceGroup.Colspan">@priceGroup.Value.ToString("F") €</td>
+                                            if (priceGroup.Value == 0)
+                                            {
+                                                <td colspan="@priceGroup.Colspan"><abbr title="Non disponibile">ND</abbr></td>
+                                            }
+                                            else
+                                            {
+                                                <td colspan="@priceGroup.Colspan">@priceGroup.Value.ToString("F") €</td>
+                                            }
                                         }
                                     </tr>
                                 }

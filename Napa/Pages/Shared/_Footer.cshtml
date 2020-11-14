@@ -1,66 +1,71 @@
 ﻿<footer class="footer text-light">
     <div class="container">
         <div class="row">
-            <div class="col-12 mt-5 col-sm-6 col-md-3">
+            <div class="col-12 mt-5 col-sm-6 col-md-4 col-lg-3 overflow-hidden">
                 <ul>
                     <li>
                         <a class="brand" href="/">
                             <inlinesvg src="Logo.svg" />
                         </a>
                     </li>
-                    <li>&copy; 2020 - Napa Lounge Cafe</li>
+                    <li><span class="copyright">&copy; 2020 - Napa Lounge Cafe</span></li>
                     <li><span class="oi oi-badge"></span> <a asp-area="" asp-page="/Privacy">Privacy</a></li>
                 </ul>
             </div>
-            <div class="col-12 mt-5 col-sm-6 col-md-3">
+            <div class="col-12 mt-5 col-sm-6 col-md-2 col-lg-2 overflow-hidden">
                 <h5>Socials</h5>
-                <table class="table table-borderless text-light">
-                    <tr>
-                        <td width="1"><span class="oi social facebook"><inlinesvg src="socials/flat-facebook.svg" /></span></td>
-                        <td><a href="https://www.facebook.com/napaloungecafe" target="_blank">Facebook</a></td>
-                    </tr>
-                    <tr>
-                        <td><span class="oi social instagram"><inlinesvg src="socials/flat-instagram.svg" /></span></td>
-                        <td><a href="https://www.instagram.com/napaloungecafe/" target="_blank">Instagram</a></td>
-                    </tr>
-                </table>
+                <div class="d-flex flex-column">
+                    <div class="d-flex align-items-start mb-3">
+                        <span class="oi social facebook mr-2"><inlinesvg src="socials/flat-facebook.svg" /></span>
+                        <a href="https://www.facebook.com/napaloungecafe" target="_blank">Facebook</a>
+                    </div>
+                    <div class="d-flex align-items-start mb-3">
+                        <span class="oi social instagram mr-2"><inlinesvg src="socials/flat-instagram.svg" /></span>
+                        <a href="https://www.instagram.com/napaloungecafe/" target="_blank">Instagram</a>
+                    </div>
+                </div>
             </div>
-            <div class="col-12 mt-5 col-sm-6 col-md-3">
+            <div class="col-12 mt-5 col-sm-6 col-md-6 col-lg-4 overflow-hidden">
                 <h5>Contacts</h5>
-                <table class="table table-borderless text-light">
-                    <tr>
-                        <td width="1"><span class="oi oi-location"></span></td>
-                        <td><span class="text-muted">Indirizzo</span><br /> Via Antonio Lazzari 2, 30174 Venezia VE</td>
-                    </tr>
-                    <tr>
-                        <td><span class="oi oi-phone"></span></td>
-                        <td><span class="text-muted">Telefono</span><br /> <a href="tel:+39041959108">041 959108</a></td>
-                    </tr>
-                    <tr>
-                        <td><span class="oi oi-clock"></span></td>
-                        <td><span class="text-muted">Orari di apertura</span><br /> Lun-Sab 17:30 - 00:00</td>
-                    </tr>
-                </table>
+                <div class="d-flex flex-column text-light">
+                    <div class="d-flex align-items-start mb-3">
+                        <div class="mr-3"><span class="oi oi-location"></span></div>
+                        <div>
+                            <span class="text-muted">Indirizzo</span><br />
+                            <span>
+                                Via Antonio Lazzari 2<br />
+                                30174 Venezia VE
+                            </span>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-start mb-3">
+                        <div class="mr-3"><span class="oi oi-phone"></span></div>
+                        <div><span class="text-muted">Telefono</span><br /> <a href="tel:+39041959108">041 959108</a></div>
+                    </div>
+                    <div class="d-flex align-items-start mb-3">
+                        <div class="mr-3"><span class="oi oi-clock"></span></div>
+                        <div>
+                            <div class="timetable">
+                                <div class="text-nowrap text-muted">Orari di apertura</div>
+                                <div class="text-nowrap">Mar 15:30-18:00</div>
+                                <div class="text-nowrap">Mer 08:00-14:00 15:30-18:00</div>
+                                <div class="text-nowrap">Gio 15:30-18:00</div>
+                                <div class="text-nowrap">Ven 08:00-14:00 15:30-18:00</div>
+                                <div class="text-nowrap">Sab 10:00-12:00 15:30-18:00</div>
+                                <div class="text-nowrap">Dom 15:00-18:00</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="col-12 mt-5 col-sm-6 col-md-3">
-                <ul>
-                    <li><h5>Navigation</h5></li>
-                    <li>
-                        <a class="nav-link" href="/#Home">Home</a>
-                    </li>
-                    <li>
-                        <a class="nav-link" href="/#AboutUs">About us</a>
-                    </li>
-                    <li>
-                        <a class="nav-link" href="/Menu">Menu</a>
-                    </li>
-                    @*<li>
-                            <a class="nav-link" asp-area="" asp-page="@Pagelink" asp-fragment="Gallery">Gallery</a>
-                        </li>*@
-                    <li>
-                        <a class="nav-link" href="/#ContactUs">Contact us</a>
-                    </li>
-                </ul>
+            <div class="col-12 mt-5 col-sm-6 d-md-none d-lg-block col-lg-3 overflow-hidden">
+                <h5>Navigation</h5>
+                <div class="d-flex flex-column text-light">
+                    <a class="mb-2 ml-2" href="/#Home">Home</a>
+                    <a class="mb-2 ml-2" href="/#AboutUs">About us</a>
+                    <a class="mb-2 ml-2" href="/Menu">Menu</a>
+                    <a class="mb-2 ml-2" href="/#ContactUs">Contact us</a>
+                </div>
             </div>
         </div>
     </div>

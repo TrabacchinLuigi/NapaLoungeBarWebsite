@@ -50,11 +50,15 @@ header .brand > svg {
     #FullPage-Menu .page-title {
         margin-bottom: 100px;
     }
+    .copyright { font-size:2em; }
 }
 
 @media (max-width: 767px ) {
     #Motto {
         font-size: 10vw;
+    }
+    .copyright {
+        font-size: 1em;
     }
 }
 
@@ -72,15 +76,24 @@ header .brand > svg {
     header .brand > svg {
         width: 256px;
     }
+    .copyright {
+        font-size: 1em;
+    }
 }
 
 @media (min-width: 992px) {
     header .brand > svg {
         width: 256px;
     }
+    .copyright {
+        font-size: 1em;
+    }
 }
 
 @media (min-width: 1200px) {
+    .copyright {
+        font-size: 1em;
+    }
 }
 
 header {

@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Napa.Data.Identity
+namespace Napa.Data.Identity.Migrations
 {
     public partial class Intial : Migration
     {

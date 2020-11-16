@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Napa.Data;
+using Napa.Data.Menu;
 
-namespace Napa.Data.Menu
+namespace Napa.Data.Menu.Migrations
 {
-    [DbContext(typeof(MenuDbContext))]
-    [Migration("20200928182311_Category-Image-Url")]
-    partial class CategoryImageUrl
+    [DbContext(typeof(DbContext))]
+    [Migration("20200927175330_Orderabe")]
+    partial class Orderabe
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -26,9 +26,6 @@ namespace Napa.Data.Menu
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("ImageUrl")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");

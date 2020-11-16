@@ -1,0 +1,67 @@
+﻿@page
+@attribute [Authorize(Roles = Napa.Roles.Administrator)]
+@inject Napa.Data.Settings.DbContext dbc
+@{
+    ViewData["LightHeader"] = true;
+    ViewData["Title"] = "Menu editor";
+}
+@section Styles {
+}
+@section PreScripts {
+}
+@section Scripts {
+
+
+}
+@{
+    var comparer = new DayOfWeekComparer(System.Globalization.CultureInfo.CurrentCulture);
+    var allOpenings = dbc.Openings.ToArray();
+    var daysOfWeek = Enum.GetValues(typeof(DayOfWeek))
+        .OfType<DayOfWeek>()
+        .OrderBy(x => x, comparer)
+        .Select(x => new SelectListItem(System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.AbbreviatedDayNames[(Int32)x], ((Int32)x).ToString()));
+}
+<div class="backend-page">
+    <h1>Aperture</h1>
+    <div class="overflow-auto">
+        <table class="table table-bordered table-striped">
+            <tr>
+                <th>Giorno inizio</th>
+                <th>Giorno fine</th>
+                <th>Ora inizio</th>
+                <th>Ora fine</th>
+                <th width="1"></th>
+            </tr>
+            @foreach (var opening in allOpenings)
+            {
+                <tr>
+                    <td>
+                        <div class="input-group input-group-sm">
+                            <select asp-for="@opening.StartDayOfWeek" asp-items="daysOfWeek" class="form-control form-control-sm"></select>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="input-group input-group-sm">
+                            <select asp-for="@opening.EndDayOfWeek" asp-items="daysOfWeek" class="form-control form-control-sm"></select>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="input-group input-group-sm">
+                            <input type="time" asp-for="@opening.StartTime" class="form-control form-control-sm" />
+                        </div>
+                    </td>
+                    <td>
+                        <div class="input-group input-group-sm">
+                            <input type="time" asp-for="@opening.EndTime" class="form-control form-control-sm" />
+                        </div>
+                    </td>
+                    <td>
+                        <a href="#" class="btn btn-danger btn-sm"><span class="oi oi-trash"></span></a>
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+    <a href="#" class="btn btn-primary btn-sm"><span class="oi oi-plus"></span></a>
+
+</div>

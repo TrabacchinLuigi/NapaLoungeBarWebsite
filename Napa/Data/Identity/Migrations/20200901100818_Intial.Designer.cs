@@ -7,9 +7,9 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Napa.Data;
 
-namespace Napa.Data.Identity
+namespace Napa.Data.Identity.Migrations
 {
-    [DbContext(typeof(IdentityDbContext))]
+    [DbContext(typeof(DbContext))]
     [Migration("20200901100818_Intial")]
     partial class Intial
     {

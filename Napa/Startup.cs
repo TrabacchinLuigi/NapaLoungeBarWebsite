@@ -15,7 +15,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Napa.Areas.Identity;
 using Microsoft.Extensions.Logging;
-using Napa.Data;
 using Tewr.Blazor.FileReader;
 
 namespace Napa
@@ -34,10 +33,22 @@ namespace Napa
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddIdentityEmailSender(x => Configuration.GetSection("Options:MailSender").Bind(x));
-            services.AddDbContext<Data.IdentityDbContext>(options =>
+            services.AddDbContext<Data.Settings.DbContext>(options =>
+            {
+                options.UseSqlServer(
+                    Configuration.GetConnectionString("SettingsConnection")
+                //,
+                //x =>
+                //{
+                //    x.MigrationsHistoryTable("__EFMigrationsHistory", "settings");
+                //}
+                );
+            });
+
+            services.AddDbContext<Data.Identity.DbContext>(options =>
                options.UseSqlServer(
                    Configuration.GetConnectionString("IdentityConnection")));
-            services.AddDbContext<Data.MenuDbContext>(options =>
+            services.AddDbContext<Data.Menu.DbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("MenuConnection")));
             services.AddDefaultIdentity<IdentityUser>(
@@ -47,7 +58,7 @@ namespace Napa
                     options.Password.RequireNonAlphanumeric = false;
                 })
                 .AddRoles<IdentityRole>()
-                .AddEntityFrameworkStores<Data.IdentityDbContext>();
+                .AddEntityFrameworkStores<Data.Identity.DbContext>();
             services.AddRazorPages();
             services
                 .AddServerSideBlazor()
@@ -63,7 +74,7 @@ namespace Napa
                 .AddFacebook(options =>
                 {
                     options.AppId = Configuration.GetValue<String>("Options:ExternalLogins:Facebook:AppId");
-                    options.AppSecret = Configuration.GetValue<String>("Options:ExternalLogins:Facebook:AppSecret") ;
+                    options.AppSecret = Configuration.GetValue<String>("Options:ExternalLogins:Facebook:AppSecret");
                 })
                 .AddGoogle(googleOptions =>
                 {
@@ -126,6 +137,11 @@ namespace Napa
 
         private static async Task Initialize(IApplicationBuilder app)
         {
+            var cultureInfo = new System.Globalization.CultureInfo("it-IT");
+
+            System.Globalization.CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+            System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
             using (var startUpScope = app.ApplicationServices.CreateScope())
             {
                 var loggerFactory = startUpScope.ServiceProvider.GetRequiredService<ILoggerFactory>();
@@ -134,7 +150,7 @@ namespace Napa
                 {
                     using (var tempScope = startUpScope.ServiceProvider.CreateScope())
                     {
-                        var dbc = tempScope.ServiceProvider.GetRequiredService<IdentityDbContext>();
+                        var dbc = tempScope.ServiceProvider.GetRequiredService<Data.Identity.DbContext>();
                         _logger.LogInformation("Migrating Identity database to last version");
                         dbc.Database.Migrate();
                     }
@@ -161,8 +177,19 @@ namespace Napa
                 {
                     using (var tempScope = startUpScope.ServiceProvider.CreateScope())
                     {
-                        var dbc = tempScope.ServiceProvider.GetRequiredService<MenuDbContext>();
-                        _logger.LogInformation("Migrating Menu database to last version"); 
+                        var dbc = tempScope.ServiceProvider.GetRequiredService<Data.Menu.DbContext>();
+                        _logger.LogInformation("Migrating Menu database to last version");
+                        dbc.Database.Migrate();
+                    }
+                }
+                catch (Exception ex) { _logger.LogError(ex, "can't migrate menu database"); }
+
+                try
+                {
+                    using (var tempScope = startUpScope.ServiceProvider.CreateScope())
+                    {
+                        var dbc = tempScope.ServiceProvider.GetRequiredService<Data.Settings.DbContext>();
+                        _logger.LogInformation("Migrating Settings database to last version");
                         dbc.Database.Migrate();
                     }
                 }

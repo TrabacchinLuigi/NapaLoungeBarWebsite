@@ -1,4 +1,4 @@
-﻿@page
+﻿@page "/backend/{**SubRoute:nonfile}"
 @attribute [Authorize(Roles = Napa.Roles.Administrator)]
 @{
     ViewData["LightHeader"] = true;
@@ -7,8 +7,9 @@
 @section Styles {
     <style type="text/css">
         .tooltip {
-            opacity: 1!important;
+            opacity: 1 !important;
         }
+
         .tooltip-inner > img {
             display: block;
             max-height: 100%;
@@ -20,12 +21,13 @@
     <script src="/libs/popper/umd/popper.min.js"></script>
 }
 @section Scripts {
+    <base href="/">
     <script src="_framework/blazor.server.js"></script>
     <script src="/NapaJsInterop.js"></script>
 }
 
 <div class="backend-page">
-    <component type="typeof(Components.MenuEditorApp)" render-mode="Server" />
+    <component type="typeof(Napa.BackendApp)" render-mode="ServerPrerendered" />
 </div>
 
 <div id="blazor-error-ui" class="fixed-top vw-100 vh-100">

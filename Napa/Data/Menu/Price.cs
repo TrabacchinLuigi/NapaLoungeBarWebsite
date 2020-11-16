@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Napa.Data
+namespace Napa.Data.Menu
 {
-    public class MenuPrice
+    public class Price
     {
         public Int32 Id { get; set; }
-        public MenuItem MenuItem { get; set; }
+        public Item MenuItem { get; set; }
         public Int32 MenuItemId { get; set; }
 
-        public MenuCategoryPriceKind MenuPriceKind { get; set; }
+        public CategoryPriceKind MenuPriceKind { get; set; }
         public Int32 MenuPriceKindId { get; set; }
         public Single Value { get; set; }
     }

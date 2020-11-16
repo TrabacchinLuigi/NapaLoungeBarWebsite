@@ -1,7 +1,8 @@
-﻿@using Tewr.Blazor.FileReader
+﻿@page "/backend/menueditor"
+@using Tewr.Blazor.FileReader
 @using System.IO
 @implements IDisposable
-@inject MenuDbContext _menuDbc
+@inject D.Menu.DbContext _menuDbc
 @inject IServiceScopeFactory _serviceScopeFactory
 @inject IJSRuntime JSRuntime
 @inject IFileReaderService fileReaderService
@@ -99,10 +100,10 @@
                                 var price = _menuDbc.Prices.Where(x => x.MenuItemId == item.Id).Where(x => x.MenuPriceKindId == priceKind.Id).SingleOrDefault();
                                 if (price == null)
                                 {
-                                    price = new MenuPrice() { MenuItemId = item.Id, MenuPriceKindId = priceKind.Id };
+                                    price = new D.Menu.Price() { MenuItemId = item.Id, MenuPriceKindId = priceKind.Id };
                                     using (var scope = _serviceScopeFactory.CreateScope())
                                     {
-                                        var tempDbc = scope.ServiceProvider.GetRequiredService<MenuDbContext>();
+                                        var tempDbc = scope.ServiceProvider.GetRequiredService<D.Menu.DbContext>();
                                         tempDbc.Prices.Add(price);
                                         tempDbc.SaveChanges();
                                     }
@@ -136,8 +137,8 @@
     private Boolean disposedValue;
     private DotNetObjectReference<MenuEditorApp> _dotNetObjectReference;
     private ElementReference inputTypeFileElement;
-    private INamed _entityToDelete = null;
-    private MenuCategory changingImageCategory = null;
+    private D.INamed _entityToDelete = null;
+    private D.Menu.Category changingImageCategory = null;
 
     private Boolean _shouldRender;
     protected override bool ShouldRender() => _shouldRender;
@@ -160,10 +161,10 @@
     {
         await AvoidingRenderAsync(async () =>
         {
-            var cat = new MenuCategory() { Name = "Nuova categoria", Show = false, Order = _menuDbc.Categories.Local.Count() };
+            var cat = new D.Menu. Category() { Name = "Nuova categoria", Show = false, Order = _menuDbc.Categories.Local.Count() };
             using (var scope = _serviceScopeFactory.CreateScope())
             {
-                var tempDbc = scope.ServiceProvider.GetRequiredService<MenuDbContext>();
+                var tempDbc = scope.ServiceProvider.GetRequiredService<D.Menu.DbContext>();
                 tempDbc.Categories.Add(cat);
                 await tempDbc.SaveChangesAsync();
             }
@@ -171,14 +172,14 @@
         });
     }
 
-    private async Task HandleAddColumn(MenuCategory category)
+    private async Task HandleAddColumn(D.Menu.Category category)
     {
         await AvoidingRenderAsync(async () =>
         {
-            var col = new MenuCategoryPriceKind() { CategoryId = category.Id, Name = "Qualsiasi", Order = _menuDbc.CategoriesPriceKind.Local.Count() };
+            var col = new D.Menu.CategoryPriceKind() { CategoryId = category.Id, Name = "Qualsiasi", Order = _menuDbc.CategoriesPriceKind.Local.Count() };
             using (var scope = _serviceScopeFactory.CreateScope())
             {
-                var tempDbc = scope.ServiceProvider.GetRequiredService<MenuDbContext>();
+                var tempDbc = scope.ServiceProvider.GetRequiredService<D.Menu.DbContext>();
                 tempDbc.CategoriesPriceKind.Add(col);
                 await tempDbc.SaveChangesAsync();
             }
@@ -186,14 +187,14 @@
         });
     }
 
-    private async Task HandleAddNewItem(MenuCategory category)
+    private async Task HandleAddNewItem(D.Menu.Category category)
     {
         await AvoidingRenderAsync(async () =>
         {
-            var newItem = new MenuItem() { CategoryId = category.Id, Show = false, Name = "New Item", Order = _menuDbc.Items.Local.Count() };
+            var newItem = new D.Menu.Item() { CategoryId = category.Id, Show = false, Name = "New Item", Order = _menuDbc.Items.Local.Count() };
             using (var scope = _serviceScopeFactory.CreateScope())
             {
-                var tempDbc = scope.ServiceProvider.GetRequiredService<MenuDbContext>();
+                var tempDbc = scope.ServiceProvider.GetRequiredService<D.Menu.DbContext>();
                 tempDbc.Items.Add(newItem);
                 await tempDbc.SaveChangesAsync();
             }
@@ -201,19 +202,19 @@
         });
     }
 
-    private void InitializeDelete(INamed entity)
+    private void InitializeDelete(D.INamed entity)
     {
         _entityToDelete = entity;
         var kind = String.Empty;
         switch (_entityToDelete)
         {
-            case MenuCategory x:
+            case D.Menu.Category x:
                 kind = "Category";
                 break;
-            case MenuCategoryPriceKind x:
+            case D.Menu.CategoryPriceKind x:
                 kind = "Price column";
                 break;
-            case MenuItem x:
+            case D.Menu.Item x:
                 kind = "Menu item";
                 break;
         }
@@ -225,13 +226,13 @@
     {
         switch (_entityToDelete)
         {
-            case MenuCategory x:
+            case D.Menu.Category x:
                 await DeleteCategory(x);
                 break;
-            case MenuCategoryPriceKind x:
+            case D.Menu.CategoryPriceKind x:
                 await DeleteColumn(x);
                 break;
-            case MenuItem x:
+            case D.Menu.Item x:
                 await DeleteMenuItem(x);
                 break;
             default: break;
@@ -239,7 +240,7 @@
         StateHasChanged();
     }
 
-    private async Task DeleteCategory(MenuCategory category)
+    private async Task DeleteCategory(D.Menu.Category category)
     {
         await AvoidingRenderAsync(async () =>
         {
@@ -262,7 +263,7 @@
         });
     }
 
-    private async Task DeleteColumn(MenuCategoryPriceKind priceKind)
+    private async Task DeleteColumn(D.Menu.CategoryPriceKind priceKind)
     {
         await AvoidingRenderAsync(async () =>
         {
@@ -274,7 +275,7 @@
         });
     }
 
-    private async Task DeleteMenuItem(MenuItem item)
+    private async Task DeleteMenuItem(D.Menu.Item item)
     {
         await AvoidingRenderAsync(async () =>
         {
@@ -286,7 +287,7 @@
         });
     }
 
-    private async Task HandleOrderableUp<T>(T item, Func<T, Boolean> filterFunc) where T : class, IOrderable
+    private async Task HandleOrderableUp<T>(T item, Func<T, Boolean> filterFunc) where T : class, D.IOrderable
     {
         await AvoidingRenderAsync(async () =>
         {
@@ -297,7 +298,7 @@
         });
     }
 
-    private async Task HandleOrderableDown<T>(T item, Func<T, Boolean> filterFunc) where T : class, IOrderable
+    private async Task HandleOrderableDown<T>(T item, Func<T, Boolean> filterFunc) where T : class, D.IOrderable
     {
         await AvoidingRenderAsync(async () =>
         {

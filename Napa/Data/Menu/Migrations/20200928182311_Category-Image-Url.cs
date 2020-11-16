@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Napa.Data.Menu
+namespace Napa.Data.Menu.Migrations
 {
     public partial class CategoryImageUrl : Migration
     {

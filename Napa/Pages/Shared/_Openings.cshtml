@@ -1,0 +1,44 @@
+﻿@inject IServiceScopeFactory _serviceScopeFactory
+@{
+    try
+    {
+        using (var tempScope = _serviceScopeFactory.CreateScope())
+        {
+            var settingsDbc = tempScope.ServiceProvider.GetRequiredService<Data.Settings.DbContext>();
+            var comparer = new DayOfWeekComparer(System.Globalization.CultureInfo.CurrentUICulture);
+
+            var allOpenings = settingsDbc.Openings.ToArray();
+            var spanningDaysOpenings = allOpenings.Where(x => x.StartDayOfWeek != x.EndDayOfWeek).OrderBy(x => x.StartDayOfWeek, comparer).GroupBy(x => (x.StartDayOfWeek, x.EndDayOfWeek));
+            var sameDayOpening = allOpenings.Where(x => x.StartDayOfWeek == x.EndDayOfWeek).OrderBy(x => x.StartDayOfWeek, comparer).GroupBy(x => x.StartDayOfWeek);
+
+            foreach (var group in spanningDaysOpenings)
+            {
+                <div>
+                    <span class="d-inline-flex text-nowrap">
+                        <span class="text-capitalize">@System.Globalization.CultureInfo.CurrentUICulture.DateTimeFormat.AbbreviatedDayNames[(Int32)group.Key.StartDayOfWeek]</span>
+                        <span>-</span>
+                        <span class="text-capitalize">@System.Globalization.CultureInfo.CurrentUICulture.DateTimeFormat.AbbreviatedDayNames[(Int32)group.Key.EndDayOfWeek]</span>
+                    </span>
+                    @foreach (var slot in group)
+                    {
+                        <span>@slot.StartTime.ToString("hh\\:mm")-@slot.EndTime.ToString("hh\\:mm")</span>
+                    }
+                </div>
+            }
+
+            @foreach (var group in sameDayOpening)
+            {
+                <div class=" text-nowrap">
+                    <span class="text-capitalize">@System.Globalization.CultureInfo.CurrentUICulture.DateTimeFormat.AbbreviatedDayNames[(Int32)group.Key]</span>
+                    @foreach (var slot in group)
+                    {
+                        <span>@slot.StartTime.ToString("hh\\:mm")-@slot.EndTime.ToString("hh\\:mm")</span>
+                    }
+                </div>
+            }}
+    }
+    catch (Exception ex)
+    {
+
+    }
+}

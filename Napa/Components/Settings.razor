@@ -1,0 +1,125 @@
+﻿@page "/backend/settings"
+@attribute [Authorize(Roles = Napa.Roles.Administrator)]
+
+@inject IServiceScopeFactory _serviceScopeFactory
+@inject D.Settings.DbContext _dbc
+@{
+    var comparer = new DayOfWeekComparer(System.Globalization.CultureInfo.CurrentCulture);
+    var allOpenings = _dbc.Openings.ToArray();
+    var daysOfWeek = Enum.GetValues(typeof(DayOfWeek))
+        .OfType<DayOfWeek>()
+        .OrderBy(x => x, comparer);
+}
+<h3>Aperture</h3>
+<div class="overflow-auto">
+    <table class="table table-bordered table-striped">
+        <tr>
+            <th>Giorno inizio</th>
+            <th>Giorno fine</th>
+            <th>Ora inizio</th>
+            <th>Ora fine</th>
+            <th width="1"></th>
+        </tr>
+        @foreach (var opening in allOpenings)
+        {
+            var bcs = new BindConverter<TimeSpan, DateTime>(() => opening.StartTime, x => opening.StartTime = x, x => DateTime.Today + x, x => x.TimeOfDay);
+            var bce = new BindConverter<TimeSpan, DateTime>(() => opening.EndTime, x => opening.EndTime = x, x => DateTime.Today + x, x => x.TimeOfDay);
+            <tr>
+                <td>
+                    <div class="input-group input-group-sm">
+                        <select @bind="@opening.StartDayOfWeek" class="form-control form-control-sm">
+                            @foreach (var day in daysOfWeek)
+                            {
+                                <option value="@day">@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.AbbreviatedDayNames[(Int32)day]</option>
+                            }
+                        </select>
+                    </div>
+                </td>
+                <td>
+                    <div class="input-group input-group-sm">
+                        <select @bind="@opening.EndDayOfWeek" asp-items="daysOfWeek" class="form-control form-control-sm">
+                            @foreach (var day in daysOfWeek)
+                            {
+                                <option value="@day">@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.AbbreviatedDayNames[(Int32)day]</option>
+                            }
+                        </select>
+                    </div>
+                </td>
+                <td>
+                    <div class="input-group input-group-sm">
+                        <input type="time" @bind="bcs.ConvertedProperty" @onblur="HandleBlurs" class="form-control form-control-sm" />
+                    </div>
+                </td>
+                <td>
+                    <div class="input-group input-group-sm">
+                        <input type="time" @bind="bce.ConvertedProperty" @onblur="HandleBlurs" class="form-control form-control-sm" />
+                    </div>
+                </td>
+                <td>
+                    <a href="#" @onclick="async x => await HandleDelete(opening)" @onclick:preventDefault class="btn btn-danger btn-sm"><span class="oi oi-trash"></span></a>
+                </td>
+            </tr>
+        }
+    </table>
+</div>
+<a href="#" @onclick="async x => await HandleAddNewOpening()" @onclick:preventDefault class="btn btn-primary btn-sm"><span class="oi oi-plus"></span></a>
+
+
+@code {
+    private Boolean _shouldRender;
+    protected override bool ShouldRender() => _shouldRender;
+
+    private async Task AvoidingRenderAsync(Func<Task> func)
+    {
+        try
+        {
+            _shouldRender = false;
+            await func();
+        }
+        catch (Exception ex) { throw ex; /*just for inspection*/ }
+        finally
+        {
+            _shouldRender = true;
+        }
+    }
+
+    private async Task HandleAddNewOpening()
+    {
+        await AvoidingRenderAsync(async () =>
+        {
+            var opening = new D.Settings.Opening() { StartTime = TimeSpan.Zero, EndTime = TimeSpan.Zero };
+            using (var scope = _serviceScopeFactory.CreateScope())
+            {
+                var tempDbc = scope.ServiceProvider.GetRequiredService<D.Settings.DbContext>();
+                tempDbc.Openings.Add(opening);
+                await tempDbc.SaveChangesAsync();
+            }
+            _dbc.Openings.Attach(opening);
+        });
+    }
+
+    private async Task HandleDelete(D.Settings.Opening opening)
+    {
+        await AvoidingRenderAsync(async () =>
+        {
+            _dbc.Openings.Remove(opening);
+            await _dbc.SaveChangesAsync();
+        });
+    }
+
+    private async Task HandleBlurs(EventArgs eventArgs)
+    {
+        await AvoidingRenderAsync(async () => await _dbc.SaveChangesAsync());
+    }
+
+    protected override async Task OnAfterRenderAsync(Boolean firstRender)
+    {
+        try
+        {
+            await _dbc.SaveChangesAsync();
+        }
+        catch (Exception ex) { throw ex; }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+}

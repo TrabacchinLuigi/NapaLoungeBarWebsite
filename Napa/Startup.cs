@@ -16,6 +16,7 @@ using Microsoft.Extensions.Hosting;
 using Napa.Areas.Identity;
 using Microsoft.Extensions.Logging;
 using Tewr.Blazor.FileReader;
+using Microsoft.AspNetCore.Rewrite;
 
 namespace Napa
 {
@@ -94,9 +95,7 @@ namespace Napa
                         var user = await userManager.GetUserAsync(x.Principal);
                         var result = await userManager.AddToRoleAsync(user, Roles.Administrator);
                     }
-
                 };
-
             });
         }
 
@@ -115,7 +114,7 @@ namespace Napa
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 //app.UseHsts();
             }
-
+            app.UseRewriter(new RewriteOptions().AddRedirectToWwwPermanent());
             //app.UseHttpsRedirection();
             app.UseStaticFiles();
 
